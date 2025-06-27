@@ -1,0 +1,21 @@
+pipeline{
+    agent any
+    stages{
+        stage('say hello'){
+            steps{
+                echo "Hello Renupriya"
+            }
+        }
+        
+        stage('show date'){
+            steps{
+                sh 'echo $(date)'
+            }
+        }
+        stage('show calender'){
+            steps{
+                sh 'cal'
+            }
+        }
+    }
+}
