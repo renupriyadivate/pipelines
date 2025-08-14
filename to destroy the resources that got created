@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+        AWS_DEFAULT_REGION    = 'us-west-1'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout your Terraform repo
+                git branch: 'main', url: 'https://github.com/renupriyadivate/TerraformFiles.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir('/var/lib/jenkins/workspace/my-first-pipeline/files') {  
+                    // Use SAME workspace as your apply pipeline
+                    sh 'terraform init'
+                }
+            }
+        }
+
+        stage('Terraform Destroy') {
+            steps {
+                dir('/var/lib/jenkins/workspace/my-first-pipeline/files') {  
+                    // Use SAME workspace where terraform.tfstate exists
+                    sh 'terraform destroy -auto-approve'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "💖 All Terraform resources have been destroyed successfully!"
+        }
+        failure {
+            echo "⚠️ Destroy failed. Check logs for details."
+        }
+    }
+}
